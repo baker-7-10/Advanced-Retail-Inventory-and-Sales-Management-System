@@ -1,0 +1,66 @@
+
+
+services:
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: retail_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: retail_db
+      MYSQL_USER: retail_user
+      MYSQL_PASSWORD: retail_password
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - retail-network
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      timeout: 20s
+      retries: 10
+
+  # NestJS Backend
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: retail_backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USERNAME: retail_user
+      DB_PASSWORD: retail_password
+      DB_NAME: retail_db
+      JWT_SECRET: change_this_to_a_very_strong_secret_in_production
+      JWT_EXPIRES_IN: 7d
+      FRONTEND_URL: http://localhost:4200
+    ports:
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - retail-network
+
+  # AngularJS Frontend (placeholder - add when ready)
+  # frontend:
+  #   build:
+  #     context: ../retail-frontend
+  #   ports:
+  #     - '4200:80'
+  #   networks:
+  #     - retail-network
+
+volumes:
+  mysql_data:
+
+networks:
+  retail-network:
+    driver: bridge
