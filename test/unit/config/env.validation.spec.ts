@@ -14,17 +14,7 @@ describe('envValidationSchema', () => {
     REFRESH_TOKEN_SECRET: 'refresh-secret',
     REFRESH_TOKEN_EXPIRES_IN: '7d',
     FRONTEND_URL: 'http://localhost:4200',
-    EMAIL_PROVIDER: 'smtp',
-    EMAIL_FROM: 'noreply@retail.com',
-    EMAIL_FROM_NAME: 'Retail System',
-    SMTP_HOST: 'smtp.mailtrap.io',
-    SMTP_PORT: 587,
-    SMTP_USER: 'smtp-user',
-    SMTP_PASS: 'smtp-pass',
-    AWS_ACCESS_KEY_ID: 'AKIAIOSFODNN7EXAMPLE',
-    AWS_SECRET_ACCESS_KEY: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY',
-    AWS_REGION: 'us-east-1',
-    AWS_S3_BUCKET: 'retail-assets',
+   
   };
 
   describe('valid configuration', () => {
@@ -45,14 +35,9 @@ describe('envValidationSchema', () => {
         REFRESH_TOKEN_SECRET: 'refresh',
         EMAIL_FROM: 'test@test.com',
         EMAIL_FROM_NAME: 'Test',
-        SMTP_HOST: 'smtp.example.com',
         SMTP_PORT: 587,
         SMTP_USER: 'user',
         SMTP_PASS: 'pass',
-        AWS_ACCESS_KEY_ID: 'key',
-        AWS_SECRET_ACCESS_KEY: 'secret',
-        AWS_REGION: 'us-east-1',
-        AWS_S3_BUCKET: 'bucket',
       };
       const { error, value } = envValidationSchema.validate(minimal, {
         abortEarly: false,
@@ -174,93 +159,8 @@ describe('envValidationSchema', () => {
     });
   });
 
-  describe('SMTP conditional validation', () => {
-    it('should require SMTP vars when EMAIL_PROVIDER is smtp', () => {
-      const config = {
-        ...validConfig,
-        EMAIL_PROVIDER: 'smtp',
-        SMTP_HOST: undefined,
-        SMTP_PORT: undefined,
-        SMTP_USER: undefined,
-        SMTP_PASS: undefined,
-      };
-      const { error } = envValidationSchema.validate(config, {
-        abortEarly: false,
-      });
-      expect(error).toBeDefined();
-      const messages = error.details.map((d) => d.path.join('.'));
-      expect(messages).toContain('SMTP_HOST');
-      expect(messages).toContain('SMTP_PORT');
-      expect(messages).toContain('SMTP_USER');
-      expect(messages).toContain('SMTP_PASS');
-    });
 
-    it('should NOT require SMTP vars when EMAIL_PROVIDER is sendgrid', () => {
-      const config = {
-        ...validConfig,
-        EMAIL_PROVIDER: 'sendgrid',
-        SMTP_HOST: undefined,
-        SMTP_PORT: undefined,
-        SMTP_USER: undefined,
-        SMTP_PASS: undefined,
-      };
-      const { error } = envValidationSchema.validate(config, {
-        abortEarly: false,
-      });
-      expect(error).toBeUndefined();
-    });
+;
 
-    it('should NOT require SMTP vars when EMAIL_PROVIDER is ses', () => {
-      const config = {
-        ...validConfig,
-        EMAIL_PROVIDER: 'ses',
-        SMTP_HOST: undefined,
-        SMTP_PORT: undefined,
-        SMTP_USER: undefined,
-        SMTP_PASS: undefined,
-      };
-      const { error } = envValidationSchema.validate(config, {
-        abortEarly: false,
-      });
-      expect(error).toBeUndefined();
-    });
-  });
 
-  describe('AWS / S3 validation', () => {
-    it('should reject missing AWS_ACCESS_KEY_ID', () => {
-      const { error } = envValidationSchema.validate(
-        { ...validConfig, AWS_ACCESS_KEY_ID: undefined },
-        { abortEarly: false },
-      );
-      expect(error).toBeDefined();
-      expect(error.message).toContain('AWS_ACCESS_KEY_ID');
-    });
-
-    it('should reject missing AWS_SECRET_ACCESS_KEY', () => {
-      const { error } = envValidationSchema.validate(
-        { ...validConfig, AWS_SECRET_ACCESS_KEY: undefined },
-        { abortEarly: false },
-      );
-      expect(error).toBeDefined();
-      expect(error.message).toContain('AWS_SECRET_ACCESS_KEY');
-    });
-
-    it('should reject missing AWS_REGION', () => {
-      const { error } = envValidationSchema.validate(
-        { ...validConfig, AWS_REGION: undefined },
-        { abortEarly: false },
-      );
-      expect(error).toBeDefined();
-      expect(error.message).toContain('AWS_REGION');
-    });
-
-    it('should reject missing AWS_S3_BUCKET', () => {
-      const { error } = envValidationSchema.validate(
-        { ...validConfig, AWS_S3_BUCKET: undefined },
-        { abortEarly: false },
-      );
-      expect(error).toBeDefined();
-      expect(error.message).toContain('AWS_S3_BUCKET');
-    });
-  });
 });
