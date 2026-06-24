@@ -25,11 +25,11 @@ services:
   # NestJS Backend
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: retail_backend
     restart: unless-stopped
-    env_file: .env
+    env_file: ./backend/.env
     environment:
       NODE_ENV: development
       PORT: 3000
@@ -49,14 +49,19 @@ services:
     networks:
       - retail-network
 
-  # AngularJS Frontend (placeholder - add when ready)
-  # frontend:
-  #   build:
-  #     context: ../retail-frontend
-  #   ports:
-  #     - '4200:80'
-  #   networks:
-  #     - retail-network
+  # Angular Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: retail_frontend
+    restart: unless-stopped
+    ports:
+      - '4200:80'
+    depends_on:
+      - backend
+    networks:
+      - retail-network
 
 volumes:
   mysql_data:
