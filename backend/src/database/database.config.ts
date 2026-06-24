@@ -6,7 +6,7 @@ import { Category } from '../categories/entities/category.entity';
 import { Product } from '../products/entities/product.entity';
 import { Sale } from '../sales/entities/sale.entity';
 import { SaleItem } from '../sales/entities/sale-item.entity';
-import { Inventory } from '../inventory/inventory.entity';
+import { Inventory } from '../inventory/entities/inventory.entity';
 
 export function createTypeOrmOptions(configService: ConfigService): TypeOrmModuleOptions {
   return {

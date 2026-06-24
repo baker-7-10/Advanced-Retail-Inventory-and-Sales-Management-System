@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Inventory } from './inventory.entity';
-import { InventoryRepository } from './inventory.repository';
+import { Inventory } from './entities/inventory.entity';
+import { InventoryRepository } from './repositories/inventory.repository';
 import { InventoryService } from './inventory.service';
 import { InventoryController } from './inventory.controller';
 import { InventoryGateway } from './inventory.gateway';

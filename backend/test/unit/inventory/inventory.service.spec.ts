@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InventoryService } from '../../../src/inventory/inventory.service';
-import { InventoryRepository } from '../../../src/inventory/inventory.repository';
+import { InventoryRepository } from '../../../src/inventory/repositories/inventory.repository';
 import { AuditLogService } from '../../../src/common/services/audit-log.service';
 import { buildMockInventory } from '../../fixtures';
 

@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { InventoryRepository } from '../../../src/inventory/inventory.repository';
-import { Inventory } from '../../../src/inventory/inventory.entity';
+import { InventoryRepository } from '../../../src/inventory/repositories/inventory.repository';
+import { Inventory } from '../../../src/inventory/entities/inventory.entity';
 import { buildMockInventory } from '../../fixtures';
 
 function mockQueryBuilder(overrides: Partial<jest.Mocked<SelectQueryBuilder<Inventory>>> = {}): jest.Mocked<SelectQueryBuilder<Inventory>> {

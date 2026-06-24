@@ -5,7 +5,7 @@ import {
 } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
 import { SaleItem } from '../../sales/entities/sale-item.entity';
-import { Inventory } from '../../inventory/inventory.entity';
+import { Inventory } from '../../inventory/entities/inventory.entity';
 
 @Entity('products')
 @Index(['name'])

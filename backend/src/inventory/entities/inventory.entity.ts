@@ -3,7 +3,7 @@ import {
   CreateDateColumn, UpdateDateColumn,
   OneToOne, JoinColumn, Index,
 } from 'typeorm';
-import { Product } from '../products/entities/product.entity';
+import { Product } from '../../products/entities/product.entity';
 
 @Entity('inventory')
 @Index(['quantity'])

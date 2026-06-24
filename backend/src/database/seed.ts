@@ -3,7 +3,7 @@ import dataSource from './data-source';
 import { User, UserRole } from '../users/entities/user.entity';
 import { Category } from '../categories/entities/category.entity';
 import { Product } from '../products/entities/product.entity';
-import { Inventory } from '../inventory/inventory.entity';
+import { Inventory } from '../inventory/entities/inventory.entity';
 
 async function seed() {
   const ds = await dataSource.initialize();

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
-import { InventoryRepository } from './inventory.repository';
+import { InventoryRepository } from './repositories/inventory.repository';
 import { AuditLogService } from '../common/services/audit-log.service';
 import { AuditEvent } from '../common/audit/audit-event.enum';
 

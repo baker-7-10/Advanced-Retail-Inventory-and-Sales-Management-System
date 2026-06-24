@@ -9,7 +9,7 @@ import { SalesRepository } from '../../../src/sales/repositories/sales.repositor
 import { SaleItemsRepository } from '../../../src/sales/repositories/sale-items.repository';
 import { ProductsRepository } from '../../../src/products/repositories/products.repository';
 import { InventoryService } from '../../../src/inventory/inventory.service';
-import { InventoryRepository } from '../../../src/inventory/inventory.repository';
+import { InventoryRepository } from '../../../src/inventory/repositories/inventory.repository';
 import { InventoryGateway } from '../../../src/inventory/inventory.gateway';
 import { AuditLogService } from '../../../src/common/services/audit-log.service';
 import { JwtAuthGuard } from '../../../src/common/guards/jwt-auth.guard';
@@ -18,7 +18,7 @@ import { Sale } from '../../../src/sales/entities/sale.entity';
 import { SaleItem } from '../../../src/sales/entities/sale-item.entity';
 import { SaleStatus } from '../../../src/sales/entities/sale.entity';
 import { Product } from '../../../src/products/entities/product.entity';
-import { Inventory } from '../../../src/inventory/inventory.entity';
+import { Inventory } from '../../../src/inventory/entities/inventory.entity';
 import { Category } from '../../../src/categories/entities/category.entity';
 
 function mockAuthGuard(): CanActivate {

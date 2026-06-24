@@ -7,7 +7,7 @@ import { CategoriesService } from '../../src/categories/categories.service';
 import { CategoriesRepository } from '../../src/categories/repositories/categories.repository';
 import { UsersService } from '../../src/users/users.service';
 import { UsersRepository } from '../../src/users/repositories/users.repository';
-import { InventoryRepository } from '../../src/inventory/inventory.repository';
+import { InventoryRepository } from '../../src/inventory/repositories/inventory.repository';
 import { DataSource } from 'typeorm';
 
 export function buildMockProductsService(): jest.Mocked<ProductsService> {

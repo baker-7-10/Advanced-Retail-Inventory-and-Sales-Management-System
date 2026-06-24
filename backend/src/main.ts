@@ -21,10 +21,10 @@ import { SaleResponseDto, PaginatedSalesResponseDto } from './sales/dto/sale-res
 import { InvoiceResponseDto } from './sales/dto/invoice-response.dto';
 import { InventoryResponseDto } from './inventory/dto/inventory-response.dto';
 import { InventoryStatsResponseDto } from './inventory/dto/inventory-stats-response.dto';
-import { SalesSummaryResponseDto } from './common/dto/sales-summary-response.dto';
-import { DailySalesResponseDto } from './common/dto/daily-sales-response.dto';
-import { TopProductsResponseDto } from './common/dto/top-products-response.dto';
-import { CategorySalesResponseDto } from './common/dto/category-sales-response.dto';
+import { SalesSummaryResponseDto } from './reports/dto/sales-summary-response.dto';
+import { DailySalesResponseDto } from './reports/dto/daily-sales-response.dto';
+import { TopProductsResponseDto } from './reports/dto/top-products-response.dto';
+import { CategorySalesResponseDto } from './reports/dto/category-sales-response.dto';
 import { StockReportResponseDto } from './reports/dto/stock-report-response.dto';
 
 async function bootstrap() {

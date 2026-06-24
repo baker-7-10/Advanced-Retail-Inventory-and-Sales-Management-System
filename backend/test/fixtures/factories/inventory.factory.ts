@@ -1,4 +1,4 @@
-import { Inventory } from '../../../src/inventory/inventory.entity';
+import { Inventory } from '../../../src/inventory/entities/inventory.entity';
 
 export function buildMockInventory(overrides: Partial<Inventory> = {}): Inventory {
   const inventory = new Inventory();
