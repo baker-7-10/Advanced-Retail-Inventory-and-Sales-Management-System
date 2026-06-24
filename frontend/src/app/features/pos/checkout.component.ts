@@ -14,8 +14,8 @@ import { IconComponent } from "../../shared/icon.component";
   imports: [CurrencyPipe, FormsModule, ModalComponent, IconComponent],
   template: `
     <app-modal title="Checkout" (close)="cancel.emit()">
-      <div class="space-y-5">
-        <div class="rounded-lg bg-muted/60 p-4">
+      <div class="space-y-5 ">
+        <div class="rounded-lg bg-muted/60 p-4 ">
           <div class="flex justify-between text-sm text-muted-foreground">
             <span>Subtotal</span><span>{{ cart.subtotal() | currency }}</span>
           </div>
