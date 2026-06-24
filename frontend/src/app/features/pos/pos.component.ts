@@ -8,7 +8,7 @@ import { ProductService } from "../../core/services/product.service";
 import { CartService } from "../../core/services/cart.service";
 import { RealtimeService } from "../../core/services/realtime.service";
 import { ToastService } from "../../core/services/toast.service";
-import { IconComponent } from "../../shared/icon.component";
+import { IconComponent } from "../../shared/ui/icon.component";
 import { CheckoutComponent } from "./checkout.component";
 import { InvoiceComponent } from "./invoice.component";
 

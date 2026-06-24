@@ -4,7 +4,7 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { Category, CreateProductDto, Product } from "../../core/models";
 import { ProductService } from "../../core/services/product.service";
 import { ToastService } from "../../core/services/toast.service";
-import { ModalComponent } from "../../shared/modal.component";
+import { ModalComponent } from "../../shared/ui/modal.component";
 
 @Component({
   selector: "app-product-form",

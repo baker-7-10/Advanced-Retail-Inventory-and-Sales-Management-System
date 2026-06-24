@@ -3,7 +3,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from "@angular/router";
 import { AuthService } from "../core/services/auth.service";
 import { CartService } from "../core/services/cart.service";
 import { RealtimeService } from "../core/services/realtime.service";
-import { IconComponent, IconName } from "../shared/icon.component";
+import { IconComponent, IconName } from "../shared/ui/icon.component";
 
 interface NavItem {
   label: string;

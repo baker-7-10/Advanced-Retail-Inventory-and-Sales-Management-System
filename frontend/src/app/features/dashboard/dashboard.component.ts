@@ -5,9 +5,9 @@ import { forkJoin } from "rxjs";
 import { Product, SalesReportPoint } from "../../core/models";
 import { ReportService } from "../../core/services/report.service";
 import { InventoryService } from "../../core/services/inventory.service";
-import { IconComponent, IconName } from "../../shared/icon.component";
-import { BarChartComponent, ChartPoint } from "../../shared/bar-chart.component";
+import { IconComponent, IconName } from "../../shared/ui/icon.component";
 
+import { BarChartComponent, ChartPoint } from "../../shared/charts/bar-chart.component";
 @Component({
   selector: "app-dashboard",
   standalone: true,

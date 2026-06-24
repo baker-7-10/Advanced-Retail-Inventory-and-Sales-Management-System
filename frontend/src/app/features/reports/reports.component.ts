@@ -5,8 +5,8 @@ import { forkJoin } from "rxjs";
 import { SalesReportPoint, TopProduct } from "../../core/models";
 import { ReportService } from "../../core/services/report.service";
 import { ToastService } from "../../core/services/toast.service";
-import { IconComponent } from "../../shared/icon.component";
-import { BarChartComponent, ChartPoint } from "../../shared/bar-chart.component";
+import { IconComponent } from "../../shared/ui/icon.component";
+import { BarChartComponent, ChartPoint } from "../../shared/charts/bar-chart.component";
 
 @Component({
   selector: "app-reports",

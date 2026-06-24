@@ -1,7 +1,7 @@
 import { CurrencyPipe, DatePipe } from "@angular/common";
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { Sale } from "../../core/models";
-import { IconComponent } from "../../shared/icon.component";
+import { IconComponent } from "../../shared/ui/icon.component";
 
 @Component({
   selector: "app-invoice",

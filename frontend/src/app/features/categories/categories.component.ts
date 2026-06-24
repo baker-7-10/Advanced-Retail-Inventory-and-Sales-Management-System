@@ -3,9 +3,9 @@ import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Category, CreateCategoryDto } from "../../core/models";
 import { CategoryService } from "../../core/services/category.service";
 import { ToastService } from "../../core/services/toast.service";
-import { IconComponent } from "../../shared/icon.component";
-import { ModalComponent } from "../../shared/modal.component";
-import { ConfirmDialogComponent } from "../../shared/confirm-dialog.component";
+import { IconComponent } from "../../shared/ui/icon.component";
+import { ModalComponent } from "../../shared/ui/modal.component";
+import { ConfirmDialogComponent } from "../../shared/dialogs/confirm-dialog.component";
 
 @Component({
   selector: "app-categories",

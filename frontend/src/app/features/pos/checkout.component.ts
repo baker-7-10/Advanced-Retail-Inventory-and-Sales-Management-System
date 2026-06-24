@@ -5,8 +5,8 @@ import { CartService } from "../../core/services/cart.service";
 import { SaleService } from "../../core/services/sale.service";
 import { ToastService } from "../../core/services/toast.service";
 import { CreateSaleDto, PaymentMethod, Sale } from "../../core/models";
-import { ModalComponent } from "../../shared/modal.component";
-import { IconComponent } from "../../shared/icon.component";
+import { ModalComponent } from "../../shared/ui/modal.component";
+import { IconComponent } from "../../shared/ui/icon.component";
 
 @Component({
   selector: "app-checkout",

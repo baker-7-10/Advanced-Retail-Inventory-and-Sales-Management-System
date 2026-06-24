@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { HttpErrorResponse } from "@angular/common/http";
 import { AuthService } from "../../core/services/auth.service";
-import { IconComponent } from "../../shared/icon.component";
+import { IconComponent } from "../../shared/ui/icon.component";
 
 @Component({
   selector: "app-login",

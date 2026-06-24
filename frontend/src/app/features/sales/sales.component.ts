@@ -3,8 +3,8 @@ import { Component, OnInit, inject, signal } from "@angular/core";
 import { Sale } from "../../core/models";
 import { SaleService } from "../../core/services/sale.service";
 import { ToastService } from "../../core/services/toast.service";
-import { IconComponent } from "../../shared/icon.component";
-import { ModalComponent } from "../../shared/modal.component";
+import { IconComponent } from "../../shared/ui/icon.component";
+import { ModalComponent } from "../../shared/ui/modal.component";
 
 @Component({
   selector: "app-sales",

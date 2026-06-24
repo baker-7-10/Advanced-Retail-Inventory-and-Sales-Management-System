@@ -8,8 +8,8 @@ import { ProductService } from "../../core/services/product.service";
 import { RealtimeService } from "../../core/services/realtime.service";
 import { CartService } from "../../core/services/cart.service";
 import { ToastService } from "../../core/services/toast.service";
-import { IconComponent } from "../../shared/icon.component";
-import { ConfirmDialogComponent } from "../../shared/confirm-dialog.component";
+import { IconComponent } from "../../shared/ui/icon.component";
+import { ConfirmDialogComponent } from "../../shared/dialogs/confirm-dialog.component";
 import { ProductFormComponent } from "./product-form.component";
 
 @Component({

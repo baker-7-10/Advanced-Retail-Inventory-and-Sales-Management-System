@@ -17,7 +17,7 @@ async function seed() {
     const productRepo = queryRunner.manager.getRepository(Product);
     const inventoryRepo = queryRunner.manager.getRepository(Inventory);
 
-    const existingAdmin = await userRepo.findOne({ where: { email: 'admin@retail.com' } });
+    const existingAdmin = await userRepo.findOne({ where: { email: 'admin@store.com' } });
     if (existingAdmin) {
       console.log('Seed data already exists, skipping.');
       return;
@@ -26,7 +26,7 @@ async function seed() {
     const hashedPassword = await bcrypt.hash('Admin@123', 10);
     const admin = userRepo.create({
       name: 'Admin User',
-      email: 'admin@retail.com',
+      email: 'admin@store.com',
       password: hashedPassword,
       role: UserRole.ADMIN,
       isActive: true,
@@ -104,7 +104,7 @@ async function seed() {
 
     await queryRunner.commitTransaction();
     console.log('\nSeed completed successfully!');
-    console.log('Admin login:    admin@retail.com / Admin@123');
+    console.log('Admin login:    admin@store.com / Admin@123');
     console.log('Manager login:  manager@retail.com / Admin@123');
     console.log('Employee login: employee@retail.com / Admin@123');
   } catch (err) {

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { ModalComponent } from "./modal.component";
-import { IconComponent } from "./icon.component";
+import { ModalComponent } from "../ui/modal.component";
+import { IconComponent } from "../ui/icon.component";
 
 @Component({
   selector: "app-confirm",
