@@ -17,7 +17,7 @@ export function createTypeOrmOptions(configService: ConfigService): TypeOrmModul
     password: configService.get('DB_PASSWORD', ''),
     database: configService.get('DB_NAME', 'retail_db'),
     entities: [User, Category, Product, Sale, SaleItem, Inventory],
-    synchronize: configService.get('NODE_ENV') !== 'production',
+    synchronize: false,
     migrationsRun: false,
     migrations: [join(__dirname, 'migrations', '*.{ts,js}')],
     logging: configService.get('NODE_ENV') === 'development',

@@ -6,6 +6,7 @@ import { DataSource } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { ProductsRepository } from './repositories/products.repository';
 import { InventoryService } from '../inventory/inventory.service';
+import { CategoriesRepository } from '../categories/repositories/categories.repository';
 import { AuditLogService } from '../common/services/audit-log.service';
 import { AuditEvent } from '../common/audit/audit-event.enum';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -17,11 +18,17 @@ export class ProductsService {
   constructor(
     private readonly productsRepository: ProductsRepository,
     private readonly inventoryService: InventoryService,
+    private readonly categoriesRepository: CategoriesRepository,
     private readonly dataSource: DataSource,
     private readonly auditLogService: AuditLogService,
   ) {}
 
   async create(createProductDto: CreateProductDto, userId?: number): Promise<Product> {
+    const category = await this.categoriesRepository.findById(createProductDto.categoryId);
+    if (!category) {
+      throw new BadRequestException(`Category with ID ${createProductDto.categoryId} not found`);
+    }
+
     if (createProductDto.sku) {
       const existing = await this.productsRepository.findBySku(createProductDto.sku);
       if (existing) {
@@ -56,6 +63,13 @@ export class ProductsService {
       const existing = await this.productsRepository.findBySku(updateDto.sku);
       if (existing && existing.id !== id) {
         throw new ConflictException(`SKU "${updateDto.sku}" already in use`);
+      }
+    }
+
+    if (updateDto.categoryId) {
+      const category = await this.categoriesRepository.findById(updateDto.categoryId);
+      if (!category) {
+        throw new BadRequestException(`Category with ID ${updateDto.categoryId} not found`);
       }
     }
 

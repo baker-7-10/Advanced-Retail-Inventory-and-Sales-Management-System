@@ -24,11 +24,11 @@ import { IconComponent } from "../../shared/icon.component";
             <span>{{ cart.tax() | currency }}</span>
           </div>
           <div class="mt-1 flex items-center justify-between text-sm text-muted-foreground">
-            <label for="discount">Discount</label>
+            <label for="discount">Discount %</label>
             <div class="flex items-center gap-1">
-              <span>$</span>
-              <input id="discount" type="number" min="0" class="input h-8 w-24 py-1 text-right"
+              <input id="discount" type="number" min="0" max="100" class="input h-8 w-24 py-1 text-right"
                 [ngModel]="cart.discount()" (ngModelChange)="cart.setDiscount($event)" />
+              <span>%</span>
             </div>
           </div>
           <div class="mt-3 flex justify-between border-t border-border pt-3 text-lg font-bold">
@@ -111,12 +111,9 @@ export class CheckoutComponent {
 
   complete(): void {
     this.busy.set(true);
-    const subtotal = this.cart.subtotal();
-    const discountDollars = this.cart.discount();
-    const discountPercent = subtotal > 0 ? Math.round((discountDollars / subtotal) * 100) : 0;
     const payload: CreateSaleDto = {
       items: this.cart.items().map((i) => ({ productId: i.product.id, quantity: i.quantity })),
-      discountPercent: discountPercent || undefined,
+      discountPercent: this.cart.discount() || undefined,
     };
     this.saleSvc.checkout(payload).subscribe({
       next: (sale) => {

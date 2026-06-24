@@ -29,12 +29,16 @@ export class CartService {
 
   readonly tax = computed(() => this.subtotal() * TAX_RATE);
 
-  readonly total = computed(() => this.subtotal() + this.tax() - this._discount());
+  readonly total = computed(() => {
+    const sub = this.subtotal();
+    const discPct = this._discount();
+    return sub + this.tax() - (sub * discPct / 100);
+  });
 
   readonly isEmpty = computed(() => this._lines().length === 0);
 
   setDiscount(value: number | string | null): void {
-    this._discount.set(Math.max(0, Number(value) || 0));
+    this._discount.set(Math.min(100, Math.max(0, Number(value) || 0)));
   }
 
   add(product: Product, quantity = 1): boolean {

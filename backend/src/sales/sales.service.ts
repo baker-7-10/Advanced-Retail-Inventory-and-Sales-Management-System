@@ -3,7 +3,7 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import * as crypto from 'crypto';
-import { Sale, SaleStatus } from './entities/sale.entity';
+import { Sale, SaleStatus, PaymentMethod } from './entities/sale.entity';
 import { SaleItem } from './entities/sale-item.entity';
 import { SalesRepository } from './repositories/sales.repository';
 import { SaleItemsRepository } from './repositories/sale-items.repository';
@@ -35,7 +35,7 @@ export class SalesService {
   ) {}
 
   async create(createSaleDto: CreateSaleDto, userId: number): Promise<Sale> {
-    const { items, discountPercent = 0, notes } = createSaleDto;
+    const { items, discountPercent = 0, notes, paymentMethod } = createSaleDto;
 
     const quantityMap = new Map<number, number>();
     for (const item of items) {
@@ -92,6 +92,7 @@ export class SalesService {
         discountPercent,
         discountAmount,
         total,
+        paymentMethod: paymentMethod ?? PaymentMethod.CASH,
         notes,
         userId,
         items: saleItems as SaleItem[],
@@ -141,8 +142,19 @@ export class SalesService {
       );
     }
 
-    sale.status = newStatus;
-    const updated = this.salesRepository.save(sale);
+    const updated = await this.dataSource.transaction(async (manager) => {
+      if (newStatus === SaleStatus.REFUNDED) {
+        const fullSale = await this.salesRepository.findById(sale.id, manager);
+        if (fullSale) {
+          for (const item of fullSale.items) {
+            await this.inventoryService.increaseStock(item.productId, item.quantity, manager);
+          }
+        }
+      }
+
+      sale.status = newStatus;
+      return this.salesRepository.save(sale, manager);
+    });
 
     const eventMap: Record<SaleStatus, AuditEvent> = {
       [SaleStatus.COMPLETED]: AuditEvent.SALE_COMPLETED,
@@ -181,7 +193,8 @@ export class SalesService {
 
   private generateInvoiceNumber(): string {
     const year = new Date().getFullYear();
-    const uniqueId = crypto.randomUUID().split('-')[0].toUpperCase();
-    return `INV-${year}-${uniqueId}`;
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const random = crypto.randomUUID().split('-').slice(0, 2).join('').toUpperCase();
+    return `INV-${year}-${timestamp}-${random}`;
   }
 }

@@ -7,15 +7,17 @@ import { ProductsService } from '../../../src/products/products.service';
 import { ProductsRepository } from '../../../src/products/repositories/products.repository';
 import { InventoryService } from '../../../src/inventory/inventory.service';
 import { AuditLogService } from '../../../src/common/services/audit-log.service';
+import { CategoriesRepository } from '../../../src/categories/repositories/categories.repository';
 import { CreateProductDto } from '../../../src/products/dto/create-product.dto';
 import { UpdateProductDto } from '../../../src/products/dto/update-product.dto';
 import { FilterProductDto } from '../../../src/products/dto/filter-product.dto';
-import { buildMockProduct, buildMockInventory } from '../../fixtures';
+import { buildMockProduct, buildMockInventory, buildMockCategory } from '../../fixtures';
 
 describe('ProductsService', () => {
   let service: ProductsService;
   let productsRepository: jest.Mocked<ProductsRepository>;
   let inventoryService: jest.Mocked<InventoryService>;
+  let categoriesRepository: jest.Mocked<CategoriesRepository>;
   let dataSource: jest.Mocked<DataSource>;
 
   const mockManager = {} as EntityManager;
@@ -44,6 +46,10 @@ describe('ProductsService', () => {
       getAllStock: jest.fn(),
     } as unknown as jest.Mocked<InventoryService>;
 
+    categoriesRepository = {
+      findById: jest.fn(),
+    } as unknown as jest.Mocked<CategoriesRepository>;
+
     dataSource = {
       transaction: jest.fn().mockImplementation(async <T>(cb: (m: EntityManager) => Promise<T>): Promise<T> => {
         return cb(mockManager);
@@ -55,6 +61,7 @@ describe('ProductsService', () => {
         ProductsService,
         { provide: ProductsRepository, useValue: productsRepository },
         { provide: InventoryService, useValue: inventoryService },
+        { provide: CategoriesRepository, useValue: categoriesRepository },
         { provide: DataSource, useValue: dataSource },
         { provide: AuditLogService, useValue: { log: jest.fn() } },
       ],
@@ -74,6 +81,7 @@ describe('ProductsService', () => {
 
     it('should create product successfully', async () => {
       const mockProduct = buildMockProduct({ id: 1, name: 'Gaming Mouse', price: 49.99 });
+      categoriesRepository.findById.mockResolvedValue(buildMockCategory({ id: 1 }));
       productsRepository.findBySku.mockResolvedValue(null);
       productsRepository.create.mockResolvedValue(mockProduct);
       productsRepository.findByIdOrFail.mockResolvedValue(mockProduct);
@@ -81,6 +89,7 @@ describe('ProductsService', () => {
 
       const result = await service.create(createDto);
 
+      expect(categoriesRepository.findById).toHaveBeenCalledWith(1);
       expect(productsRepository.findBySku).toHaveBeenCalledWith('SKU-GM-001');
       expect(dataSource.transaction).toHaveBeenCalledTimes(1);
       expect(productsRepository.create).toHaveBeenCalledWith({
@@ -94,6 +103,7 @@ describe('ProductsService', () => {
     });
 
     it('should reject duplicate SKU', async () => {
+      categoriesRepository.findById.mockResolvedValue(buildMockCategory({ id: 1 }));
       productsRepository.findBySku.mockResolvedValue(buildMockProduct({ sku: 'SKU-GM-001' }));
 
       await expect(service.create(createDto)).rejects.toThrow(ConflictException);
@@ -101,6 +111,7 @@ describe('ProductsService', () => {
     });
 
     it('should create inventory record', async () => {
+      categoriesRepository.findById.mockResolvedValue(buildMockCategory({ id: 1 }));
       productsRepository.findBySku.mockResolvedValue(null);
       productsRepository.create.mockResolvedValue(buildMockProduct({ id: 1 }));
       productsRepository.findByIdOrFail.mockResolvedValue(buildMockProduct({ id: 1 }));
@@ -118,6 +129,7 @@ describe('ProductsService', () => {
         stock: 0,
         categoryId: 1,
       };
+      categoriesRepository.findById.mockResolvedValue(buildMockCategory({ id: 1 }));
       productsRepository.findBySku.mockResolvedValue(null);
       productsRepository.create.mockResolvedValue(buildMockProduct({ id: 2 }));
       productsRepository.findByIdOrFail.mockResolvedValue(buildMockProduct({ id: 2 }));
@@ -135,6 +147,7 @@ describe('ProductsService', () => {
         stock: 10,
         categoryId: 1,
       };
+      categoriesRepository.findById.mockResolvedValue(buildMockCategory({ id: 1 }));
       productsRepository.create.mockResolvedValue(buildMockProduct({ id: 3, name: 'No SKU Item' }));
       productsRepository.findByIdOrFail.mockResolvedValue(buildMockProduct({ id: 3, name: 'No SKU Item' }));
       inventoryService.findOrCreate.mockResolvedValue(buildMockInventory({ productId: 3, quantity: 10 }));
@@ -143,6 +156,13 @@ describe('ProductsService', () => {
 
       expect(productsRepository.findBySku).not.toHaveBeenCalled();
       expect(productsRepository.create).toHaveBeenCalled();
+    });
+
+    it('should reject non-existent categoryId', async () => {
+      categoriesRepository.findById.mockResolvedValue(null);
+
+      await expect(service.create(createDto)).rejects.toThrow(BadRequestException);
+      expect(productsRepository.create).not.toHaveBeenCalled();
     });
   });
 

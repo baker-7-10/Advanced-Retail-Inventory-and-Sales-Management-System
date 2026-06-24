@@ -1,9 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray, IsInt, IsNumber, IsOptional,
-  IsPositive, IsString, Min, Max, ValidateNested, ArrayMinSize,
+  IsPositive, IsString, IsEnum, Min, Max, ValidateNested, ArrayMinSize,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { PaymentMethod } from '../entities/sale.entity';
 
 export class SaleItemDto {
   @ApiProperty({ example: 1, description: 'Product ID' })
@@ -40,4 +41,9 @@ export class CreateSaleDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  @ApiPropertyOptional({ enum: PaymentMethod, default: PaymentMethod.CASH, description: 'Payment method' })
+  @IsOptional()
+  @IsEnum(PaymentMethod)
+  paymentMethod?: PaymentMethod;
 }

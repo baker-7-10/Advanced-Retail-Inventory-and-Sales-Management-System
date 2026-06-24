@@ -1,8 +1,7 @@
-import { SUCCESS_MESSAGE_KEY } from '../../../../src/common/decorators/success-message.decorator';
+import { SuccessMessage, SUCCESS_MESSAGE_KEY } from '../../../../src/common/decorators/success-message.decorator';
 
 describe('SuccessMessage Decorator', () => {
   it('should set metadata with message', () => {
-    const { SuccessMessage } = require('../../../../src/common/decorators/success-message.decorator');
     const message = 'Category created successfully';
     const decorator = SuccessMessage(message);
 

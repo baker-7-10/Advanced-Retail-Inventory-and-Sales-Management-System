@@ -163,7 +163,7 @@ describe('InventoryGateway', () => {
   });
 
   describe('Inventory Events', () => {
-    it('should emit inventory.updated with standard payload', () => {
+    it('should emit stockUpdated with standard payload', () => {
       const toSpy = jest.spyOn(server, 'to').mockReturnValue(server as any);
       const emitSpy = jest.spyOn(server, 'emit');
 
@@ -171,7 +171,7 @@ describe('InventoryGateway', () => {
 
       expect(toSpy).toHaveBeenCalledWith('inventory-room');
       expect(emitSpy).toHaveBeenCalledWith(
-        'inventory.updated',
+        'stockUpdated',
         expect.objectContaining({
           productId: 1,
           quantity: 50,

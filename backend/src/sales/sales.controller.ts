@@ -48,7 +48,7 @@ export class SalesController {
   }
 
   @Get()
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE)
   @ApiOperation({ summary: 'Get all sales transactions' })
   @ApiOkResponse({ description: 'Paginated list of sales', schema: WrappedSchema(PaginatedSalesResponseDto) })
   @ApiBadRequestResponse({ description: 'Invalid query parameters' })

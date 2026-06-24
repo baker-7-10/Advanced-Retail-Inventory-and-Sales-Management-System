@@ -1,55 +1,68 @@
-
-
 services:
-  # MySQL Database
   db:
     image: mysql:8.0
     container_name: retail_db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: retail_db
-      MYSQL_USER: retail_user
-      MYSQL_PASSWORD: retail_password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-retail_db}
+      MYSQL_USER: ${DB_USERNAME:-retail_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-retail_password}
     ports:
-      - '3306:3306'
+      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
       - retail-network
     healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
-      timeout: 20s
-      retries: 10
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
 
-  # NestJS Backend
+  migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: retail_migrate
+    restart: "no"
+    env_file:
+      - ./backend/.env
+    environment:
+      NODE_ENV: production
+      DB_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+    command: sh -c "npm run migration:run:prod && npm run seed:prod"
+    networks:
+      - retail-network
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: retail_backend
     restart: unless-stopped
-    env_file: ./backend/.env
+    env_file:
+      - ./backend/.env
     environment:
-      NODE_ENV: development
+      NODE_ENV: production
       PORT: 3000
       DB_HOST: db
-      DB_PORT: 3306
-      DB_USERNAME: retail_user
-      DB_PASSWORD: retail_password
-      DB_NAME: retail_db
-      JWT_SECRET: change_this_to_a_very_strong_secret_in_production
-      JWT_EXPIRES_IN: 7d
       FRONTEND_URL: http://localhost:4200
     ports:
-      - '3000:3000'
+      - "3000:3000"
     depends_on:
       db:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    command: node dist/main
     networks:
       - retail-network
 
-  # Angular Frontend
   frontend:
     build:
       context: ./frontend
@@ -57,9 +70,10 @@ services:
     container_name: retail_frontend
     restart: unless-stopped
     ports:
-      - '4200:80'
+      - "4200:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     networks:
       - retail-network
 

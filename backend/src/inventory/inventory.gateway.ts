@@ -9,9 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UserRole } from '../users/entities/user.entity';
 
-@WebSocketGateway({
-  namespace: '/inventory',
-})
+@WebSocketGateway()
 export class InventoryGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
@@ -65,7 +63,7 @@ export class InventoryGateway
   }
 
   emitStockUpdate(productId: number, quantity: number) {
-    this.server.to('inventory-room').emit('inventory.updated', {
+    this.server.to('inventory-room').emit('stockUpdated', {
       productId,
       quantity,
       timestamp: new Date().toISOString(),

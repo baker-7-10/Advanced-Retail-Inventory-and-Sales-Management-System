@@ -37,6 +37,10 @@ export class InventoryRepository {
     await this.getRepo(manager).decrement({ id }, 'quantity', quantity);
   }
 
+  async increment(id: number, quantity: number, manager?: EntityManager): Promise<void> {
+    await this.getRepo(manager).increment({ id }, 'quantity', quantity);
+  }
+
   async countLowStock(threshold: number = 10, manager?: EntityManager): Promise<number> {
     return this.getRepo(manager)
       .createQueryBuilder('inv')

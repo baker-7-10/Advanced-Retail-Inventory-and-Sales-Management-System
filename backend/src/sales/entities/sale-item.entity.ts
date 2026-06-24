@@ -1,6 +1,6 @@
 import {
   Entity, PrimaryGeneratedColumn, Column,
-  ManyToOne, JoinColumn,
+  ManyToOne, JoinColumn, Index,
 } from 'typeorm';
 import { Product } from '../../products/entities/product.entity';
 import { Sale } from './sale.entity';
@@ -18,6 +18,7 @@ export class SaleItem {
   sale: Sale;
 
   @Column()
+  @Index()
   productId: number;
 
   @ManyToOne(() => Product, (product) => product.saleItems, { eager: true })

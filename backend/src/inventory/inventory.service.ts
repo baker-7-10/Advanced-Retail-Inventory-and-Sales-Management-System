@@ -27,6 +27,14 @@ export class InventoryService {
     return inventory;
   }
 
+  async increaseStock(productId: number, quantity: number, manager: EntityManager): Promise<void> {
+    const inventory = await this.inventoryRepository.findByProductIdWithLock(productId, manager);
+    if (!inventory) {
+      throw new NotFoundException(`Inventory not found for product ${productId}`);
+    }
+    await this.inventoryRepository.increment(inventory.id, quantity, manager);
+  }
+
   async decreaseStock(productId: number, quantity: number, manager: EntityManager): Promise<void> {
     const inventory = await this.inventoryRepository.findByProductIdWithLock(productId, manager);
     if (!inventory) {

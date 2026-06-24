@@ -18,6 +18,7 @@ COPY package*.json ./
 RUN npm ci --only=production
 
 COPY --from=builder /app/dist ./dist
+COPY wait-for-db.js ./
 
 EXPOSE 3000
 

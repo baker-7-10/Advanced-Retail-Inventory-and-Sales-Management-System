@@ -12,6 +12,12 @@ export enum SaleStatus {
   REFUNDED = 'refunded',
 }
 
+export enum PaymentMethod {
+  CASH = 'CASH',
+  CARD = 'CARD',
+  TRANSFER = 'TRANSFER',
+}
+
 @Entity('sales')
 @Index(['status'])
 @Index(['createdAt'])
@@ -34,6 +40,9 @@ export class Sale {
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   total: number;
+
+  @Column({ type: 'enum', enum: PaymentMethod, default: PaymentMethod.CASH })
+  paymentMethod: PaymentMethod;
 
   @Column({
     type: 'enum',

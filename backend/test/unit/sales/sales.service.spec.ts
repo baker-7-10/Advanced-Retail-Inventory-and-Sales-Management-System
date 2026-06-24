@@ -111,6 +111,7 @@ describe('SalesService', () => {
     } as unknown as jest.Mocked<ProductsRepository>;
 
     inventoryService = {
+      increaseStock: jest.fn(),
       decreaseStock: jest.fn(),
       findByProductId: jest.fn(),
       findOrCreate: jest.fn(),
@@ -324,7 +325,10 @@ describe('SalesService', () => {
 
       const result = await service.updateStatus(1, SaleStatus.COMPLETED);
 
-      expect(salesRepository.save).toHaveBeenCalledWith(expect.objectContaining({ status: SaleStatus.COMPLETED }));
+      expect(salesRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({ status: SaleStatus.COMPLETED }),
+        mockManager,
+      );
       expect(result.status).toBe(SaleStatus.COMPLETED);
     });
 
@@ -338,13 +342,24 @@ describe('SalesService', () => {
       expect(result.status).toBe(SaleStatus.CANCELLED);
     });
 
-    it('should allow COMPLETED to REFUNDED', async () => {
-      const completedSale = { ...mockSale, status: SaleStatus.COMPLETED };
+    it('should allow COMPLETED to REFUNDED and restore stock', async () => {
+      const completedSale = {
+        ...mockSale,
+        status: SaleStatus.COMPLETED,
+        items: [
+          { productId: 1, quantity: 2, id: 1, saleId: 1, unitPrice: 100, subtotal: 200 },
+          { productId: 2, quantity: 1, id: 2, saleId: 1, unitPrice: 200, subtotal: 200 },
+        ] as any,
+      };
       salesRepository.findById.mockResolvedValue(completedSale);
-      salesRepository.save.mockResolvedValue({ ...completedSale, status: SaleStatus.REFUNDED });
+      salesRepository.save.mockResolvedValue({ ...completedSale, status: SaleStatus.REFUNDED } as any);
 
       const result = await service.updateStatus(1, SaleStatus.REFUNDED);
 
+      expect(salesRepository.findById).toHaveBeenCalledWith(1, mockManager);
+      expect(inventoryService.increaseStock).toHaveBeenCalledTimes(2);
+      expect(inventoryService.increaseStock).toHaveBeenCalledWith(1, 2, mockManager);
+      expect(inventoryService.increaseStock).toHaveBeenCalledWith(2, 1, mockManager);
       expect(result.status).toBe(SaleStatus.REFUNDED);
     });
 

@@ -33,6 +33,7 @@ export class Product {
   isActive: boolean;
 
   @Column()
+  @Index()
   categoryId: number;
 
   @ManyToOne(() => Category, (category) => category.products, {
