@@ -33,11 +33,6 @@ describe('envValidationSchema', () => {
         DB_NAME: 'retail_db',
         ACCESS_TOKEN_SECRET: 'secret',
         REFRESH_TOKEN_SECRET: 'refresh',
-        EMAIL_FROM: 'test@test.com',
-        EMAIL_FROM_NAME: 'Test',
-        SMTP_PORT: 587,
-        SMTP_USER: 'user',
-        SMTP_PASS: 'pass',
       };
       const { error, value } = envValidationSchema.validate(minimal, {
         abortEarly: false,
@@ -50,7 +45,6 @@ describe('envValidationSchema', () => {
       expect(value.ACCESS_TOKEN_EXPIRES_IN).toBe('15m');
       expect(value.REFRESH_TOKEN_EXPIRES_IN).toBe('7d');
       expect(value.FRONTEND_URL).toBe('http://localhost:4200');
-      expect(value.EMAIL_PROVIDER).toBe('smtp');
     });
   });
 

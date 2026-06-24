@@ -22,12 +22,4 @@ export const envValidationSchema = Joi.object({
 
   // Frontend
   FRONTEND_URL: Joi.string().uri().default('http://localhost:4200'),
-
-  // Email
-  EMAIL_FROM: Joi.string().default(''),
-  EMAIL_FROM_NAME: Joi.string().default(''),
-  EMAIL_PROVIDER: Joi.string().valid('smtp', 'sendgrid', 'mailgun').default('smtp'),
-  SMTP_PORT: Joi.number().port().default(587),
-  SMTP_USER: Joi.string().allow('').default(''),
-  SMTP_PASS: Joi.string().allow('').default(''),
 });
