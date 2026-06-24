@@ -108,9 +108,6 @@ import { IconComponent } from "../../shared/icon.component";
             </button>
           </form>
 
-          <p class="mt-6 text-center text-xs text-muted-foreground">
-            Connects to your NestJS API at <code class="font-mono">/api/v1/auth/login</code>
-          </p>
         </div>
       </div>
     </div>

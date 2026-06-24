@@ -17,9 +17,9 @@ import { InvoiceComponent } from "./invoice.component";
   standalone: true,
   imports: [CurrencyPipe, ReactiveFormsModule, IconComponent, CheckoutComponent, InvoiceComponent],
   template: `
-    <div class="grid h-[calc(100vh-9rem)] gap-5 lg:grid-cols-[1fr_24rem]">
+    <div class="flex h-[calc(100vh-9rem)] w-full flex-col overflow-hidden lg:flex-row lg:gap-5">
       <!-- Product catalog -->
-      <div class="flex min-h-0 flex-col">
+      <div class="flex min-h-0 flex-1 flex-col">
         <div class="mb-3 flex flex-wrap items-center gap-2">
           <div class="relative flex-1 min-w-48">
             <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
@@ -78,65 +78,145 @@ import { InvoiceComponent } from "./invoice.component";
         </div>
       </div>
 
-      <!-- Cart -->
-      <div class="card flex min-h-0 flex-col">
-        <div class="flex items-center justify-between border-b border-border p-4">
-          <h3 class="flex items-center gap-2 font-semibold">
-            <app-icon name="cart" [size]="18" /> Current sale
-          </h3>
-          @if (cart.items().length > 0) {
-            <button class="btn-ghost px-2 py-1 text-xs" style="color: var(--danger)" (click)="cart.clear()">Clear</button>
-          }
-        </div>
-
-        <div class="min-h-0 flex-1 overflow-y-auto p-3">
-          @if (cart.items().length === 0) {
-            <div class="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
-              <app-icon name="cart" [size]="32" />
-              <p class="mt-2 text-sm">Cart is empty</p>
-              <p class="text-xs">Tap a product to add it</p>
-            </div>
-          } @else {
-            <div class="space-y-2">
-              @for (item of cart.items(); track item.product.id) {
-                <div class="flex items-center gap-2 rounded-lg border border-border p-2">
-                  <div class="min-w-0 flex-1">
-                    <p class="truncate text-sm font-medium">{{ item.product.name }}</p>
-                    <p class="text-xs text-muted-foreground">{{ item.product.price | currency }} each</p>
-                  </div>
-                  <div class="flex items-center gap-1">
-                    <button class="btn-outline h-7 w-7 p-0" (click)="cart.decrement(item.product.id)" aria-label="Decrease">
-                      <app-icon name="minus" [size]="14" />
-                    </button>
-                    <span class="w-7 text-center text-sm font-medium">{{ item.quantity }}</span>
-                    <button class="btn-outline h-7 w-7 p-0" [disabled]="item.quantity >= item.product.stock" (click)="cart.increment(item.product.id)" aria-label="Increase">
-                      <app-icon name="plus" [size]="14" />
-                    </button>
-                  </div>
-                  <span class="w-16 text-right text-sm font-semibold">{{ item.product.price * item.quantity | currency }}</span>
-                </div>
-              }
-            </div>
-          }
-        </div>
-
-        <div class="border-t border-border p-4">
-          <div class="mb-3 space-y-1 text-sm">
-            <div class="flex justify-between text-muted-foreground">
-              <span>Subtotal</span><span>{{ cart.subtotal() | currency }}</span>
-            </div>
-            <div class="flex justify-between text-muted-foreground">
-              <span>Tax</span><span>{{ cart.tax() | currency }}</span>
-            </div>
-            <div class="flex justify-between text-base font-bold">
-              <span>Total</span><span>{{ cart.total() | currency }}</span>
-            </div>
+      <!-- Desktop cart sidebar -->
+      <div class="hidden min-h-0   min-w-36  flex-col lg:flex lg:w-96">
+        <div class="card flex min-h-0 flex-1 flex-col  ">
+          <div class="flex items-center justify-between border-b border-border p-4">
+            <h3 class="flex items-center gap-2 font-semibold">
+              <app-icon name="cart" [size]="18" /> Current sale
+            </h3>
+            @if (cart.items().length > 0) {
+              <button class="btn-ghost px-2 py-1 text-xs" style="color: var(--danger)" (click)="cart.clear()">Clear</button>
+            }
           </div>
-          <button class="btn-primary w-full py-3 text-base" [disabled]="cart.items().length === 0" (click)="showCheckout.set(true)">
-            <app-icon name="card" [size]="18" /> Charge {{ cart.total() | currency }}
-          </button>
+
+          <div class="min-h-0 flex-1 overflow-y-auto p-3">
+            @if (cart.items().length === 0) {
+              <div class="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
+                <app-icon name="cart" [size]="32" />
+                <p class="mt-2 text-sm">Cart is empty</p>
+                <p class="text-xs">Tap a product to add it</p>
+              </div>
+            } @else {
+              <div class="space-y-2">
+                @for (item of cart.items(); track item.product.id) {
+                  <div class="flex items-center gap-2 rounded-lg border border-border p-2">
+                    <div class="min-w-0 flex-1">
+                      <p class="truncate text-sm font-medium">{{ item.product.name }}</p>
+                      <p class="text-xs text-muted-foreground">{{ item.product.price | currency }} each</p>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <button class="btn-outline h-7 w-7 p-0" (click)="cart.decrement(item.product.id)" aria-label="Decrease">
+                        <app-icon name="minus" [size]="14" />
+                      </button>
+                      <span class="w-7 text-center text-sm font-medium">{{ item.quantity }}</span>
+                      <button class="btn-outline h-7 w-7 p-0" [disabled]="item.quantity >= item.product.stock" (click)="cart.increment(item.product.id)" aria-label="Increase">
+                        <app-icon name="plus" [size]="14" />
+                      </button>
+                    </div>
+                    <span class="w-16 text-right text-sm font-semibold">{{ item.product.price * item.quantity | currency }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="border-t border-border p-4">
+            <div class="mb-3 space-y-1 text-sm">
+              <div class="flex justify-between text-muted-foreground">
+                <span>Subtotal</span><span>{{ cart.subtotal() | currency }}</span>
+              </div>
+              <div class="flex justify-between text-muted-foreground">
+                <span>Tax</span><span>{{ cart.tax() | currency }}</span>
+              </div>
+              <div class="flex justify-between text-base font-bold">
+                <span>Total</span><span>{{ cart.total() | currency }}</span>
+              </div>
+            </div>
+            <button class="btn-primary w-full py-3 text-base" [disabled]="cart.items().length === 0" (click)="showCheckout.set(true)">
+              <app-icon name="card" [size]="18" /> Charge {{ cart.total() | currency }}
+            </button>
+          </div>
         </div>
       </div>
+
+      <!-- Mobile bottom bar -->
+      @if (cart.items().length > 0) {
+        <div class="flex items-center gap-3 border-t border-border bg-card px-4 py-3 lg:hidden" (click)="mobileCartOpen.set(true)">
+          <app-icon name="cart" [size]="18" />
+          <span class="text-sm font-semibold">{{ cart.items().length }}</span>
+          <span class="flex-1 text-sm text-muted-foreground">item{{ cart.items().length !== 1 ? 's' : '' }}</span>
+          <span class="text-sm font-bold">{{ cart.total() | currency }}</span>
+          <button class="btn-primary py-2 text-sm">View Cart</button>
+        </div>
+      }
+
+      <!-- Mobile cart overlay -->
+      @if (mobileCartOpen()) {
+        <div class="fixed inset-0 z-50 flex flex-col bg-background lg:hidden">
+          <div class="flex items-center justify-between border-b border-border px-4 py-3">
+            <h3 class="flex items-center gap-2 font-semibold">
+              <app-icon name="cart" [size]="18" /> Current sale
+            </h3>
+            <div class="flex items-center gap-2">
+              @if (cart.items().length > 0) {
+                <button class="btn-ghost px-2 py-1 text-xs" style="color: var(--danger)" (click)="clearCart()">Clear</button>
+              }
+              <button class="btn-ghost p-1" (click)="mobileCartOpen.set(false)">
+                <app-icon name="close" [size]="20" />
+              </button>
+            </div>
+          </div>
+
+          <div class="min-h-0 flex-1 overflow-y-auto p-4">
+            @if (cart.items().length === 0) {
+              <div class="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
+                <app-icon name="cart" [size]="32" />
+                <p class="mt-2 text-sm">Cart is empty</p>
+                <p class="text-xs">Tap a product to add it</p>
+              </div>
+            } @else {
+              <div class="space-y-2">
+                @for (item of cart.items(); track item.product.id) {
+                  <div class="flex items-center gap-2 rounded-lg border border-border p-2">
+                    <div class="min-w-0 flex-1">
+                      <p class="truncate text-sm font-medium">{{ item.product.name }}</p>
+                      <p class="text-xs text-muted-foreground">{{ item.product.price | currency }} each</p>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <button class="btn-outline h-7 w-7 p-0" (click)="cart.decrement(item.product.id)" aria-label="Decrease">
+                        <app-icon name="minus" [size]="14" />
+                      </button>
+                      <span class="w-7 text-center text-sm font-medium">{{ item.quantity }}</span>
+                      <button class="btn-outline h-7 w-7 p-0" [disabled]="item.quantity >= item.product.stock" (click)="cart.increment(item.product.id)" aria-label="Increase">
+                        <app-icon name="plus" [size]="14" />
+                      </button>
+                    </div>
+                    <span class="w-16 text-right text-sm font-semibold">{{ item.product.price * item.quantity | currency }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="border-t border-border p-4">
+            <div class="mb-3 space-y-1 text-sm">
+              <div class="flex justify-between text-muted-foreground">
+                <span>Subtotal</span><span>{{ cart.subtotal() | currency }}</span>
+              </div>
+              <div class="flex justify-between text-muted-foreground">
+                <span>Tax</span><span>{{ cart.tax() | currency }}</span>
+              </div>
+              <div class="flex justify-between text-base font-bold">
+                <span>Total</span><span>{{ cart.total() | currency }}</span>
+              </div>
+            </div>
+            <button class="btn-primary w-full py-3 text-base" [disabled]="cart.items().length === 0" (click)="mobileCartOpen.set(false); showCheckout.set(true)">
+              <app-icon name="card" [size]="18" /> Charge {{ cart.total() | currency }}
+            </button>
+          </div>
+        </div>
+      }
     </div>
 
     @if (showCheckout()) {
@@ -163,6 +243,7 @@ export class PosComponent implements OnInit, OnDestroy {
   showCheckout = signal(false);
   lastSale = signal<Sale | null>(null);
   skeletons = Array.from({ length: 8 });
+  mobileCartOpen = signal(false);
 
   search = new FormControl("", { nonNullable: true });
 
@@ -212,8 +293,14 @@ export class PosComponent implements OnInit, OnDestroy {
 
   onCompleted(sale: Sale): void {
     this.showCheckout.set(false);
+    this.mobileCartOpen.set(false);
     this.cart.clear();
     this.lastSale.set(sale);
     this.load();
+  }
+
+  clearCart(): void {
+    this.cart.clear();
+    this.mobileCartOpen.set(false);
   }
 }

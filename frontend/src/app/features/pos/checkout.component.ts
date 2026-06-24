@@ -71,7 +71,7 @@ import { IconComponent } from "../../shared/icon.component";
         }
       </div>
 
-      <div footer class="flex justify-end gap-2">
+      <div footer class="flex justify-end gap-2 mt-4" >
         <button class="btn-outline" (click)="cancel.emit()" [disabled]="busy()">Cancel</button>
         <button class="btn-primary min-w-32" (click)="complete()" [disabled]="busy() || !canComplete()">
           @if (busy()) { Processing… } @else { Complete sale }
@@ -111,11 +111,12 @@ export class CheckoutComponent {
 
   complete(): void {
     this.busy.set(true);
+    const subtotal = this.cart.subtotal();
+    const discountDollars = this.cart.discount();
+    const discountPercent = subtotal > 0 ? Math.round((discountDollars / subtotal) * 100) : 0;
     const payload: CreateSaleDto = {
-      items: this.cart.items().map((i) => ({ productId: i.product.id, quantity: i.quantity, unitPrice: i.product.price })),
-      paymentMethod: this.method(),
-      discount: this.cart.discount() || undefined,
-      amountPaid: this.method() === "cash" ? (this.amountPaid() ?? this.cart.total()) : this.cart.total(),
+      items: this.cart.items().map((i) => ({ productId: i.product.id, quantity: i.quantity })),
+      discountPercent: discountPercent || undefined,
     };
     this.saleSvc.checkout(payload).subscribe({
       next: (sale) => {

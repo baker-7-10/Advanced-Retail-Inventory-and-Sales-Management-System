@@ -139,10 +139,9 @@ export interface Sale {
 }
 
 export interface CreateSaleDto {
-  items: { productId: number; quantity: number; unitPrice: number }[];
-  paymentMethod?: PaymentMethod;
-  discount?: number;
-  amountPaid?: number;
+  items: { productId: number; quantity: number }[];
+  discountPercent?: number;
+  notes?: string;
 }
 
 export interface Invoice {
