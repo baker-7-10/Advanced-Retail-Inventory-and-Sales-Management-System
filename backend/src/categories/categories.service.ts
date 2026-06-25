@@ -1,5 +1,5 @@
 import {
-  Injectable, NotFoundException, ConflictException,
+  Injectable, ConflictException,
   BadRequestException,
 } from '@nestjs/common';
 import { Category } from './entities/category.entity';

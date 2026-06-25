@@ -52,7 +52,7 @@ export class InventoryGateway
       this.logger.log(`Client connected: ${client.id} (User: ${payload.sub}, Role: ${payload.role})`);
 
       client.join('inventory-room');
-    } catch (_e) {
+    } catch {
       this.logger.warn(`Unauthorized WebSocket connection: ${client.id}`);
       client.disconnect();
     }
