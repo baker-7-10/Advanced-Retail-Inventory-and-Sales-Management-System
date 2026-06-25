@@ -65,31 +65,31 @@ export class ProductsRepository {
     } = filterDto;
 
     const repo = this.getRepo(manager);
-    const query: SelectQueryBuilder<Product> = repo
+    let query: SelectQueryBuilder<Product> = repo
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category')
       .leftJoinAndSelect('product.inventory', 'inventory')
       .where('product.isActive = :isActive', { isActive: true });
 
-    const isFulltextSearch = search && search.trim().length >= 3;
+    const searchTerm = search?.trim();
+    const isFulltextSearch = !!searchTerm && searchTerm.length >= 3;
 
-    if (search) {
+    if (searchTerm) {
+      query.andWhere(
+        '(product.name LIKE :search OR product.description LIKE :search OR product.sku LIKE :search)',
+        { search: `%${searchTerm}%` },
+      );
+
       if (isFulltextSearch) {
-        const cleaned = search.trim();
-        query.andWhere(
-          'MATCH(product.name, product.description) AGAINST(:search IN NATURAL LANGUAGE MODE)',
-          { search: cleaned },
-        );
-        query.addSelect(
-          'MATCH(product.name, product.description) AGAINST(:searchRelevance IN NATURAL LANGUAGE MODE)',
-          'relevance',
-        );
-        query.setParameter('searchRelevance', cleaned);
-      } else {
-        query.andWhere(
-          '(product.name LIKE :search OR product.description LIKE :search OR product.sku LIKE :search)',
-          { search: `%${search.trim()}%` },
-        );
+        try {
+          query.addSelect(
+            'MATCH(product.name, product.description, product.sku) AGAINST(:relevance IN BOOLEAN MODE)',
+            'relevance',
+          );
+          query.setParameter('relevance', `${searchTerm}*`);
+        } catch {
+          // fulltext index unavailable — relevance sort skipped
+        }
       }
     }
 
@@ -125,7 +125,41 @@ export class ProductsRepository {
     const skip = (page - 1) * limit;
     query.skip(skip).take(limit);
 
-    const [products, total] = await query.getManyAndCount();
+    let products: Product[];
+    let total: number;
+    try {
+      [products, total] = await query.getManyAndCount();
+    } catch {
+      // fulltext MATCH in addSelect may fail if index is missing — retry without it
+      query = repo
+        .createQueryBuilder('product')
+        .leftJoinAndSelect('product.category', 'category')
+        .leftJoinAndSelect('product.inventory', 'inventory')
+        .where('product.isActive = :isActive', { isActive: true });
+
+      if (searchTerm) {
+        query.andWhere(
+          '(product.name LIKE :search OR product.description LIKE :search OR product.sku LIKE :search)',
+          { search: `%${searchTerm}%` },
+        );
+      }
+      if (categoryId) query.andWhere('product.categoryId = :categoryId', { categoryId });
+      if (minPrice !== undefined) query.andWhere('product.price >= :minPrice', { minPrice });
+      if (maxPrice !== undefined) query.andWhere('product.price <= :maxPrice', { maxPrice });
+      if (inStock === true) query.andWhere('inventory.quantity > 0');
+
+      const allowedSortColumns = ['name', 'price', 'stock', 'createdAt'];
+      const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : 'createdAt';
+      const safeSortOrder = sortOrder === 'ASC' ? 'ASC' : 'DESC';
+      if (safeSortBy === 'stock') {
+        query.orderBy('inventory.quantity', safeSortOrder);
+      } else {
+        query.orderBy(`product.${safeSortBy}`, safeSortOrder);
+      }
+
+      query.skip(skip).take(limit);
+      [products, total] = await query.getManyAndCount();
+    }
 
     return {
       data: products,

@@ -1,17 +1,10 @@
-# ---- Build Stage ----
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 WORKDIR /app
 
 COPY package.json package-lock.json pnpm-lock.yaml ./
 RUN npm ci
 
 COPY . .
-RUN npm run build
 
-# ---- Production Stage ----
-FROM nginx:stable-alpine AS production
-COPY --from=builder /app/dist/retail/browser /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 4200
+CMD ["npm", "run", "dev"]

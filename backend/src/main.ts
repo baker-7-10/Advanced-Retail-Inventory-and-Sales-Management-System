@@ -75,49 +75,46 @@ async function bootstrap() {
   // Global exception filter
   app.useGlobalFilters(new GlobalExceptionFilter());
 
-  // Swagger documentation
-  if (configService.get('NODE_ENV') !== 'production') {
-    const config = new DocumentBuilder()
-      .setTitle('Retail Management API')
-      .setDescription('Advanced Retail Inventory and Sales Management System')
-      .setVersion('1.0')
-      .addBearerAuth(
-        { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
-        'JWT-auth',
-      )
-      .addTag('Authentication', 'Authentication endpoints')
-      .addTag('Users', 'User management')
-      .addTag('categories', 'Product categories')
-      .addTag('Products', 'Product management')
-      .addTag('sales', 'Sales transactions')
-      .addTag('Inventory', 'Inventory management')
-      .addTag('reports', 'Reports and analytics')
-      .build();
+  const config = new DocumentBuilder()
+    .setTitle('Retail Management API')
+    .setDescription('Advanced Retail Inventory and Sales Management System')
+    .setVersion('1.0')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'JWT-auth',
+    )
+    .addTag('Authentication', 'Authentication endpoints')
+    .addTag('Users', 'User management')
+    .addTag('categories', 'Product categories')
+    .addTag('Products', 'Product management')
+    .addTag('sales', 'Sales transactions')
+    .addTag('Inventory', 'Inventory management')
+    .addTag('reports', 'Reports and analytics')
+    .build();
 
-    const document = SwaggerModule.createDocument(app, config, {
-      extraModels: [
-        AuthResponseDto,
-        AuthUserResponseDto,
-        UserResponseDto,
-        PaginatedUsersResponseDto,
-        CategoryResponseDto,
-        PaginatedCategoryResponseDto,
-        ProductResponseDto,
-        PaginatedProductsResponseDto,
-        SaleResponseDto,
-        PaginatedSalesResponseDto,
-        InvoiceResponseDto,
-        InventoryResponseDto,
-        InventoryStatsResponseDto,
-        SalesSummaryResponseDto,
-        DailySalesResponseDto,
-        TopProductsResponseDto,
-        CategorySalesResponseDto,
-        StockReportResponseDto,
-      ],
-    });
-    SwaggerModule.setup('api/docs', app, document);
-  }
+  const document = SwaggerModule.createDocument(app, config, {
+    extraModels: [
+      AuthResponseDto,
+      AuthUserResponseDto,
+      UserResponseDto,
+      PaginatedUsersResponseDto,
+      CategoryResponseDto,
+      PaginatedCategoryResponseDto,
+      ProductResponseDto,
+      PaginatedProductsResponseDto,
+      SaleResponseDto,
+      PaginatedSalesResponseDto,
+      InvoiceResponseDto,
+      InventoryResponseDto,
+      InventoryStatsResponseDto,
+      SalesSummaryResponseDto,
+      DailySalesResponseDto,
+      TopProductsResponseDto,
+      CategorySalesResponseDto,
+      StockReportResponseDto,
+    ],
+  });
+  SwaggerModule.setup('api/docs', app, document);
 
   const port = configService.get<number>('PORT', 3000);
   await app.listen(port);

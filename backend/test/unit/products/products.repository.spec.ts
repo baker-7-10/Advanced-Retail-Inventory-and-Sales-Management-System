@@ -161,14 +161,14 @@ describe('ProductsRepository', () => {
       await repository.findAllPaginated(filterDto);
 
       expect(qb.andWhere).toHaveBeenCalledWith(
-        'MATCH(product.name, product.description) AGAINST(:search IN NATURAL LANGUAGE MODE)',
-        { search: 'mouse' },
+        '(product.name LIKE :search OR product.description LIKE :search OR product.sku LIKE :search)',
+        { search: '%mouse%' },
       );
       expect(qb.addSelect).toHaveBeenCalledWith(
-        'MATCH(product.name, product.description) AGAINST(:searchRelevance IN NATURAL LANGUAGE MODE)',
+        'MATCH(product.name, product.description, product.sku) AGAINST(:relevance IN BOOLEAN MODE)',
         'relevance',
       );
-      expect(qb.setParameter).toHaveBeenCalledWith('searchRelevance', 'mouse');
+      expect(qb.setParameter).toHaveBeenCalledWith('relevance', 'mouse*');
       expect(qb.orderBy).toHaveBeenCalledWith('relevance', 'DESC');
     });
 

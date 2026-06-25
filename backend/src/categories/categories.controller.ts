@@ -47,7 +47,7 @@ export class CategoriesController {
 
   @Get()
   @SkipThrottle()
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE)
   @ApiOperation({ summary: 'Get all categories with pagination, search, and filters' })
   @ApiOkResponse({ description: 'Paginated list of categories', schema: WrappedSchema(PaginatedCategoryResponseDto) })
   @ApiBadRequestResponse({ description: 'Invalid query parameters' })
@@ -56,7 +56,7 @@ export class CategoriesController {
   }
 
   @Get(':id')
-  @Roles(UserRole.ADMIN, UserRole.MANAGER)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.EMPLOYEE)
   @ApiOperation({ summary: 'Get a category by ID' })
   @ApiOkResponse({ description: 'Category found', schema: WrappedSchema(CategoryResponseDto) })
   @ApiNotFoundResponse({ description: 'Category not found' })

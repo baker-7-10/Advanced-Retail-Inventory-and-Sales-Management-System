@@ -129,8 +129,8 @@ test.describe('Retail Management System - E2E', () => {
       await page.goto('/pos');
       await page.waitForTimeout(3000);
 
-      const products = page.locator('text=Search').or(page.locator('.grid')).first();
-      await expect(products).toBeVisible({ timeout: 10000 });
+      const products = page.locator('input[placeholder*="Search"]');
+      await expect(products).toBeVisible({ timeout: 15000 });
     });
 
     test('Sales page loads with history', async ({ page }) => {

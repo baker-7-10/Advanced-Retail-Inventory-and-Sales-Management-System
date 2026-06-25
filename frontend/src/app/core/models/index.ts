@@ -104,7 +104,7 @@ export interface ProductQuery {
   minPrice?: number;
   maxPrice?: number;
   sortBy?: string;
-  order?: "ASC" | "DESC";
+  sortOrder?: "ASC" | "DESC";
 }
 
 // ----- Sales -----

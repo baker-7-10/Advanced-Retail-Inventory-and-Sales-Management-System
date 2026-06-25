@@ -226,7 +226,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
             minPrice: f.minPrice ?? undefined,
             maxPrice: f.maxPrice ?? undefined,
             sortBy: hasSearch ? undefined : (this.sortBy() || undefined),
-            order: hasSearch ? undefined : (this.sortBy() ? this.order() : undefined),
+            sortOrder: hasSearch ? undefined : (this.sortBy() ? this.order() : undefined),
           };
           return this.productSvc.list(query);
         }),

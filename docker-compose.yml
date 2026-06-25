@@ -30,7 +30,7 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       DB_HOST: db
     depends_on:
       db:
@@ -48,7 +48,7 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       PORT: 3000
       DB_HOST: db
       FRONTEND_URL: http://localhost:4200
@@ -70,7 +70,13 @@ services:
     container_name: retail_frontend
     restart: unless-stopped
     ports:
-      - "4200:80"
+      - "4200:4200"
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/angular.json:/app/angular.json
+      - ./frontend/tailwind.config.js:/app/tailwind.config.js
+      - ./frontend/tsconfig.json:/app/tsconfig.json
+      - ./frontend/tsconfig.app.json:/app/tsconfig.app.json
     depends_on:
       backend:
         condition: service_started

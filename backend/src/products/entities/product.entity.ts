@@ -11,7 +11,7 @@ import { Inventory } from '../../inventory/entities/inventory.entity';
 @Index(['name'])
 @Index(['price'])
 @Index(['sku'])
-@Index('IDX_products_name_description_fulltext', ['name', 'description'], { fulltext: true })
+@Index('IDX_products_name_description_fulltext', ['name', 'description', 'sku'], { fulltext: true })
 export class Product {
   @PrimaryGeneratedColumn()
   id: number;
