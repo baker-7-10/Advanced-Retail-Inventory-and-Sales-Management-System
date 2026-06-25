@@ -1,7 +1,7 @@
 import { CurrencyPipe } from "@angular/common";
 import { Component, OnDestroy, OnInit, computed, inject, signal } from "@angular/core";
 import { FormBuilder, ReactiveFormsModule } from "@angular/forms";
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from "rxjs";
+import { Subject, debounceTime, distinctUntilChanged, switchMap, takeUntil } from "rxjs";
 import { Category, PaginationMeta, Product, ProductQuery } from "../../core/models";
 import { CategoryService } from "../../core/services/category.service";
 import { ProductService } from "../../core/services/product.service";
@@ -193,6 +193,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   skeletons = Array.from({ length: 6 });
 
   private page = signal(1);
+  private load$ = new Subject<void>();
   private sortBy = signal<string>("");
   private order = signal<"ASC" | "DESC">("ASC");
 
@@ -210,13 +211,48 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.categorySvc.list().subscribe((res) => this.categories.set(res.items));
-    this.load();
+
+    this.load$
+      .pipe(
+        switchMap(() => {
+          this.loading.set(true);
+          const f = this.filters.getRawValue();
+          const hasSearch = !!(f.search as string);
+          const query: ProductQuery = {
+            page: this.page(),
+            limit: 10,
+            search: (f.search as string) || undefined,
+            categoryId: f.categoryId ? Number(f.categoryId) : undefined,
+            minPrice: f.minPrice ?? undefined,
+            maxPrice: f.maxPrice ?? undefined,
+            sortBy: hasSearch ? undefined : (this.sortBy() || undefined),
+            order: hasSearch ? undefined : (this.sortBy() ? this.order() : undefined),
+          };
+          return this.productSvc.list(query);
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe({
+        next: (res) => {
+          this.products.set(res.items);
+          this.meta.set(res.meta);
+          this.loading.set(false);
+        },
+        error: () => {
+          this.loading.set(false);
+          this.toast.error("Failed to load products. Check that the API is running.");
+        },
+      });
 
     this.filters.valueChanges
-      .pipe(debounceTime(350), distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)), takeUntil(this.destroy$))
+      .pipe(
+        debounceTime(350),
+        distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
+        takeUntil(this.destroy$),
+      )
       .subscribe(() => {
         this.page.set(1);
-        this.load();
+        this.load$.next();
       });
 
     this.rt.stockUpdated$.pipe(takeUntil(this.destroy$)).subscribe(({ productId, stock }) => {
@@ -224,6 +260,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
         list.map((p) => (p.id === productId ? { ...p, stock } : p)),
       );
     });
+
+    this.load();
   }
 
   ngOnDestroy(): void {
@@ -232,29 +270,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   private load(): void {
-    this.loading.set(true);
-    const f = this.filters.getRawValue();
-    const query: ProductQuery = {
-      page: this.page(),
-      limit: 10,
-      search: (f.search as string) || undefined,
-      categoryId: f.categoryId ? Number(f.categoryId) : undefined,
-      minPrice: f.minPrice ?? undefined,
-      maxPrice: f.maxPrice ?? undefined,
-      sortBy: this.sortBy() || undefined,
-      order: this.sortBy() ? this.order() : undefined,
-    };
-    this.productSvc.list(query).subscribe({
-      next: (res) => {
-        this.products.set(res.items);
-        this.meta.set(res.meta);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.loading.set(false);
-        this.toast.error("Failed to load products. Check that the API is running.");
-      },
-    });
+    this.load$.next();
   }
 
   goToPage(p: number): void {

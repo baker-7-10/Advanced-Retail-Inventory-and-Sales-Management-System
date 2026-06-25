@@ -29,6 +29,7 @@ function buildMockService(): jest.Mocked<ProductsService> {
     remove: jest.fn(),
     updateStock: jest.fn(),
     getLowStockProducts: jest.fn(),
+    search: jest.fn(),
   } as unknown as jest.Mocked<ProductsService>;
 }
 
@@ -270,6 +271,18 @@ describe('Products (e2e)', () => {
         .query({ search: 'mouse' });
 
       expect(mockService.findAll).toHaveBeenCalledWith(expect.objectContaining({ search: 'mouse' }));
+    });
+
+    it('search endpoint works', async () => {
+      mockService = buildMockService();
+      mockService.search.mockResolvedValue({ data: [mockProduct], meta: { total: 1, page: 1, limit: 20 } } as any);
+      app = await createApp(mockService, { id: 1, email: 'admin@store.com', role: UserRole.ADMIN });
+
+      await request(app.getHttpServer())
+        .get('/products/search')
+        .query({ q: 'mouse' });
+
+      expect(mockService.search).toHaveBeenCalledWith(expect.objectContaining({ q: 'mouse' }));
     });
 
     it('sorting works', async () => {

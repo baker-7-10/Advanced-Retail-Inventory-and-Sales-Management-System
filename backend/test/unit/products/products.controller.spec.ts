@@ -19,6 +19,7 @@ describe('ProductsController', () => {
       remove: jest.fn(),
       updateStock: jest.fn(),
       getLowStockProducts: jest.fn(),
+      search: jest.fn(),
     } as unknown as jest.Mocked<ProductsService>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -62,6 +63,22 @@ describe('ProductsController', () => {
       const result = await controller.findAll(filterDto);
 
       expect(productsService.findAll).toHaveBeenCalledWith(filterDto);
+      expect(result).toEqual(paginatedResult);
+    });
+  });
+
+  describe('search', () => {
+    it('should call productsService.search with SearchProductDto', async () => {
+      const searchDto = { q: 'mouse', page: 2, limit: 10 };
+      const paginatedResult = {
+        data: [],
+        meta: { total: 0, page: 2, limit: 10, totalPages: 0, hasNextPage: false, hasPrevPage: false },
+      };
+      productsService.search.mockResolvedValue(paginatedResult as any);
+
+      const result = await controller.search(searchDto as any);
+
+      expect(productsService.search).toHaveBeenCalledWith(searchDto);
       expect(result).toEqual(paginatedResult);
     });
   });

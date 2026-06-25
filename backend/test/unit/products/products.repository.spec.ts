@@ -12,6 +12,8 @@ function mockQueryBuilder(overrides: Partial<jest.Mocked<SelectQueryBuilder<Prod
     leftJoinAndSelect: jest.fn().mockReturnThis(),
     where: jest.fn().mockReturnThis(),
     andWhere: jest.fn().mockReturnThis(),
+    addSelect: jest.fn().mockReturnThis(),
+    setParameter: jest.fn().mockReturnThis(),
     orderBy: jest.fn().mockReturnThis(),
     skip: jest.fn().mockReturnThis(),
     take: jest.fn().mockReturnThis(),
@@ -21,10 +23,11 @@ function mockQueryBuilder(overrides: Partial<jest.Mocked<SelectQueryBuilder<Prod
     ...overrides,
   } as unknown as jest.Mocked<SelectQueryBuilder<Product>>;
 
-  // Ensure chainable methods return self
   qb.leftJoinAndSelect.mockReturnValue(qb);
   qb.where.mockReturnValue(qb);
   qb.andWhere.mockReturnValue(qb);
+  qb.addSelect.mockReturnValue(qb);
+  qb.setParameter.mockReturnValue(qb);
   qb.orderBy.mockReturnValue(qb);
   qb.skip.mockReturnValue(qb);
   qb.take.mockReturnValue(qb);
@@ -150,7 +153,7 @@ describe('ProductsRepository', () => {
       expect(result.meta.total).toBe(1);
     });
 
-    it('should apply search filter', async () => {
+    it('should apply fulltext search for terms >= 3 chars', async () => {
       qb.getManyAndCount.mockResolvedValue([[mockProduct], 1]);
 
       const filterDto = new FilterProductDto();
@@ -158,9 +161,29 @@ describe('ProductsRepository', () => {
       await repository.findAllPaginated(filterDto);
 
       expect(qb.andWhere).toHaveBeenCalledWith(
-        '(product.name LIKE :search OR product.description LIKE :search OR product.sku LIKE :search)',
-        { search: '%mouse%' },
+        'MATCH(product.name, product.description) AGAINST(:search IN NATURAL LANGUAGE MODE)',
+        { search: 'mouse' },
       );
+      expect(qb.addSelect).toHaveBeenCalledWith(
+        'MATCH(product.name, product.description) AGAINST(:searchRelevance IN NATURAL LANGUAGE MODE)',
+        'relevance',
+      );
+      expect(qb.setParameter).toHaveBeenCalledWith('searchRelevance', 'mouse');
+      expect(qb.orderBy).toHaveBeenCalledWith('relevance', 'DESC');
+    });
+
+    it('should fallback to LIKE for short search terms (< 3 chars)', async () => {
+      qb.getManyAndCount.mockResolvedValue([[mockProduct], 1]);
+
+      const filterDto = new FilterProductDto();
+      filterDto.search = 'ab';
+      await repository.findAllPaginated(filterDto);
+
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        '(product.name LIKE :search OR product.description LIKE :search OR product.sku LIKE :search)',
+        { search: '%ab%' },
+      );
+      expect(qb.addSelect).not.toHaveBeenCalled();
     });
 
     it('should apply category filter', async () => {

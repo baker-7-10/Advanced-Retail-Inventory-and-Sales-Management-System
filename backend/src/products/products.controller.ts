@@ -12,6 +12,7 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FilterProductDto } from './dto/filter-product.dto';
+import { SearchProductDto } from './dto/search-product.dto';
 import { ProductResponseDto } from './dto/product-response.dto';
 import { PaginatedProductsResponseDto } from './dto/paginated-products-response.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -61,6 +62,18 @@ export class ProductsController {
   @ApiForbiddenResponse({ description: 'Forbidden' })
   findAll(@Query() filterDto: FilterProductDto): Promise<PaginatedProductsResponseDto> {
     return this.productsService.findAll(filterDto);
+  }
+
+  @Get('search')
+  @SkipThrottle()
+  @ApiOperation({ summary: 'Full-text search products' })
+  @ApiQuery({ name: 'q', required: false, type: String, description: 'Search query (full-text search on name and description)' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 20)' })
+  @ApiOkResponse({ description: 'Search results retrieved successfully', schema: WrappedSchema(PaginatedProductsResponseDto) })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  search(@Query() searchDto: SearchProductDto): Promise<PaginatedProductsResponseDto> {
+    return this.productsService.search(searchDto);
   }
 
   @Get('low-stock')

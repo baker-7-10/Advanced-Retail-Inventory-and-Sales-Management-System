@@ -1,7 +1,7 @@
 import { CurrencyPipe } from "@angular/common";
 import { Component, OnDestroy, OnInit, inject, signal } from "@angular/core";
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
-import { Subject, debounceTime, distinctUntilChanged, takeUntil } from "rxjs";
+import { Subject, debounceTime, distinctUntilChanged, switchMap, takeUntil } from "rxjs";
 import { Category, Product, Sale } from "../../core/models";
 import { CategoryService } from "../../core/services/category.service";
 import { ProductService } from "../../core/services/product.service";
@@ -254,31 +254,26 @@ export class PosComponent implements OnInit, OnDestroy {
   lastSale = signal<Sale | null>(null);
   skeletons = Array.from({ length: 8 });
   mobileCartOpen = signal(false);
+  private load$ = new Subject<void>();
 
   search = new FormControl("", { nonNullable: true });
 
   ngOnInit(): void {
     this.categorySvc.list().subscribe((res) => this.categories.set(res.items));
-    this.load();
 
-    this.search.valueChanges
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe(() => this.load());
-
-    this.rt.stockUpdated$.pipe(takeUntil(this.destroy$)).subscribe(({ productId, stock }) => {
-      this.products.update((list) => list.map((p) => (p.id === productId ? { ...p, stock } : p)));
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  private load(): void {
-    this.loading.set(true);
-    this.productSvc
-      .list({ page: 1, limit: 50, search: this.search.value || undefined, categoryId: this.activeCategory() ?? undefined })
+    this.load$
+      .pipe(
+        switchMap(() => {
+          this.loading.set(true);
+          return this.productSvc.list({
+            page: 1,
+            limit: 50,
+            search: this.search.value || undefined,
+            categoryId: this.activeCategory() ?? undefined,
+          });
+        }),
+        takeUntil(this.destroy$),
+      )
       .subscribe({
         next: (res) => {
           this.products.set(res.items);
@@ -289,6 +284,25 @@ export class PosComponent implements OnInit, OnDestroy {
           this.toast.error("Failed to load products.");
         },
       });
+
+    this.search.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => this.load$.next());
+
+    this.rt.stockUpdated$.pipe(takeUntil(this.destroy$)).subscribe(({ productId, stock }) => {
+      this.products.update((list) => list.map((p) => (p.id === productId ? { ...p, stock } : p)));
+    });
+
+    this.load();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private load(): void {
+    this.load$.next();
   }
 
   filterCategory(id: number | null): void {

@@ -12,6 +12,7 @@ import { AuditEvent } from '../common/audit/audit-event.enum';
 import { CreateProductDto } from './dto/create-product.dto';
 import { FilterProductDto } from './dto/filter-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { SearchProductDto } from './dto/search-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -115,5 +116,17 @@ export class ProductsService {
 
   async getLowStockProducts(threshold: number = 10) {
     return this.inventoryService.getLowStockProducts(threshold);
+  }
+
+  async search(searchDto: SearchProductDto) {
+    const { q, page = 1, limit = 20 } = searchDto;
+    if (q) {
+      const filterDto = new FilterProductDto();
+      filterDto.search = q;
+      filterDto.page = page;
+      filterDto.limit = limit;
+      return this.productsRepository.findAllPaginated(filterDto);
+    }
+    return this.productsRepository.findAllPaginated({ page, limit } as FilterProductDto);
   }
 }

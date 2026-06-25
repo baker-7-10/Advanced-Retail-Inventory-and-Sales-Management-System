@@ -71,11 +71,26 @@ export class ProductsRepository {
       .leftJoinAndSelect('product.inventory', 'inventory')
       .where('product.isActive = :isActive', { isActive: true });
 
+    const isFulltextSearch = search && search.trim().length >= 3;
+
     if (search) {
-      query.andWhere(
-        '(product.name LIKE :search OR product.description LIKE :search OR product.sku LIKE :search)',
-        { search: `%${search}%` },
-      );
+      if (isFulltextSearch) {
+        const cleaned = search.trim();
+        query.andWhere(
+          'MATCH(product.name, product.description) AGAINST(:search IN NATURAL LANGUAGE MODE)',
+          { search: cleaned },
+        );
+        query.addSelect(
+          'MATCH(product.name, product.description) AGAINST(:searchRelevance IN NATURAL LANGUAGE MODE)',
+          'relevance',
+        );
+        query.setParameter('searchRelevance', cleaned);
+      } else {
+        query.andWhere(
+          '(product.name LIKE :search OR product.description LIKE :search OR product.sku LIKE :search)',
+          { search: `%${search.trim()}%` },
+        );
+      }
     }
 
     if (categoryId) {
@@ -93,14 +108,18 @@ export class ProductsRepository {
       query.andWhere('inventory.quantity > 0');
     }
 
-    const allowedSortColumns = ['name', 'price', 'stock', 'createdAt'];
-    const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : 'createdAt';
-    const safeSortOrder = sortOrder === 'ASC' ? 'ASC' : 'DESC';
-
-    if (safeSortBy === 'stock') {
-      query.orderBy('inventory.quantity', safeSortOrder);
+    if (isFulltextSearch) {
+      query.orderBy('relevance', 'DESC');
     } else {
-      query.orderBy(`product.${safeSortBy}`, safeSortOrder);
+      const allowedSortColumns = ['name', 'price', 'stock', 'createdAt'];
+      const safeSortBy = allowedSortColumns.includes(sortBy) ? sortBy : 'createdAt';
+      const safeSortOrder = sortOrder === 'ASC' ? 'ASC' : 'DESC';
+
+      if (safeSortBy === 'stock') {
+        query.orderBy('inventory.quantity', safeSortOrder);
+      } else {
+        query.orderBy(`product.${safeSortBy}`, safeSortOrder);
+      }
     }
 
     const skip = (page - 1) * limit;
