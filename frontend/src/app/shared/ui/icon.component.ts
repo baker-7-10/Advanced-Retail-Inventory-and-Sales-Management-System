@@ -31,7 +31,8 @@ export type IconName =
   | "card"
   | "wallet"
   | "download"
-  | "printer";
+  | "printer"
+  | "refresh";
 
 const PATHS: Record<IconName, string> = {
   dashboard:
@@ -75,6 +76,7 @@ const PATHS: Record<IconName, string> = {
   wallet: '<rect x="1" y="6" width="22" height="16" rx="2" ry="2"/><path d="M1 10h22"/><circle cx="18" cy="16" r="1"/><circle cx="18" cy="16" r="0"/>',
   download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
   printer: '<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>',
+  refresh: '<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
 };
 
 @Component({
