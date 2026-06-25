@@ -56,7 +56,8 @@ export class ReportsController {
   @ApiOkResponse({ description: 'Daily sales breakdown', schema: WrappedArraySchema(DailySalesResponseDto) })
   @ApiBadRequestResponse({ description: 'startDate and endDate are required (ISO 8601)' })
   getSalesByDay(@Query() query: SalesByDayQueryDto) {
-    return this.reportsService.getSalesByDay(query.startDate, query.endDate);
+    const endDate = query.endDate ?? new Date().toISOString().slice(0, 10);
+    return this.reportsService.getSalesByDay(query.startDate, endDate);
   }
 
   @Get('sales-by-category')

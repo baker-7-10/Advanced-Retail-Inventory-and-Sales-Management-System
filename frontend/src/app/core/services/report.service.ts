@@ -46,11 +46,15 @@ export class ReportService {
   }
 
   salesTrend(days: number): Observable<SalesReportPoint[]> {
+    const end = new Date();
     const start = new Date();
     start.setDate(start.getDate() - days);
     return this.http
       .get(`${this.base}/sales-by-day`, {
-        params: toParams({ startDate: start.toISOString().slice(0, 10) } as Record<string, unknown>),
+        params: toParams({
+          startDate: start.toISOString().slice(0, 10),
+          endDate: end.toISOString().slice(0, 10),
+        } as Record<string, unknown>),
       })
       .pipe(
         map((r) => {

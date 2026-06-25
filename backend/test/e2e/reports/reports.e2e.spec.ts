@@ -159,12 +159,12 @@ describe('Reports (e2e)', () => {
         .expect(400);
     });
 
-    it('should return 400 when only one date is provided', async () => {
+    it('should succeed when only startDate is provided (endDate defaults to today)', async () => {
       app = await createApp(mockService);
 
       await request(app.getHttpServer())
         .get('/reports/sales-by-day?startDate=2024-01-01')
-        .expect(400);
+        .expect(200);
     });
 
     it('should return 400 when startDate is after endDate', async () => {

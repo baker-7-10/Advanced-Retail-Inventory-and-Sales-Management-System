@@ -5,6 +5,7 @@ import { forkJoin } from "rxjs";
 import { Product, SalesReportPoint } from "../../core/models";
 import { ReportService } from "../../core/services/report.service";
 import { InventoryService } from "../../core/services/inventory.service";
+import { ToastService } from "../../core/services/toast.service";
 import { IconComponent, IconName } from "../../shared/ui/icon.component";
 
 import { BarChartComponent, ChartPoint } from "../../shared/charts/bar-chart.component";
@@ -40,7 +41,12 @@ import { BarChartComponent, ChartPoint } from "../../shared/charts/bar-chart.com
         <div class="card p-5 lg:col-span-2">
           <div class="mb-4 flex items-center justify-between">
             <h3 class="font-semibold">Sales trend (last 7 days)</h3>
-            <a routerLink="/reports" class="text-sm font-medium text-primary hover:underline">View reports</a>
+            <div class="flex items-center gap-2">
+              <button class="btn-ghost rounded-md px-2 py-1 text-xs font-medium" (click)="refresh()">
+                <app-icon name="refresh" [size]="14" /> Refresh
+              </button>
+              <a routerLink="/reports" class="text-sm font-medium text-primary hover:underline">View reports</a>
+            </div>
           </div>
           <div class="h-56">
             @if (!loading()) {
@@ -86,6 +92,7 @@ import { BarChartComponent, ChartPoint } from "../../shared/charts/bar-chart.com
 export class DashboardComponent implements OnInit {
   private reportSvc = inject(ReportService);
   private inventorySvc = inject(InventoryService);
+  private toast = inject(ToastService);
 
   loading = signal(true);
   lowStock = signal<Product[]>([]);
@@ -96,6 +103,16 @@ export class DashboardComponent implements OnInit {
   >([]);
 
   ngOnInit(): void {
+    this.load();
+  }
+
+  refresh(): void {
+    this.loading.set(true);
+    this.toast.info("Refreshing dashboard…");
+    this.load();
+  }
+
+  private load(): void {
     forkJoin({
       summary: this.reportSvc.summary(),
       low: this.inventorySvc.lowStock(),
