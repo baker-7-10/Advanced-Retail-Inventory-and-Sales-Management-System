@@ -65,7 +65,7 @@ export class InventoryGateway
   emitStockUpdate(productId: number, stock: number) {
     this.server.to('inventory-room').emit('stockUpdated', {
       productId,
-      stock,
+      quantity: stock,
       timestamp: new Date().toISOString(),
     });
 
