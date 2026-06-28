@@ -38,7 +38,7 @@ export class ProductsService {
     }
 
     const { stock, ...productData } = createProductDto;
-
+// t-4
     const product = await this.dataSource.transaction(async (manager) => {
       const created = await this.productsRepository.create(productData, manager);
       await this.inventoryService.findOrCreate(created.id, stock ?? 0, manager);

@@ -62,14 +62,14 @@ export class InventoryGateway
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
-  emitStockUpdate(productId: number, quantity: number) {
+  emitStockUpdate(productId: number, stock: number) {
     this.server.to('inventory-room').emit('stockUpdated', {
       productId,
-      quantity,
+      stock,
       timestamp: new Date().toISOString(),
     });
 
-    this.logger.log(`Stock update emitted: Product ${productId} -> ${quantity} units`);
+    this.logger.log(`Stock update emitted: Product ${productId} -> ${stock} units`);
   }
 
   @SubscribeMessage('watch-product')

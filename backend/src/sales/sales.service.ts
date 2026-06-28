@@ -43,8 +43,9 @@ export class SalesService {
     }
     const aggregatedItems = Array.from(quantityMap, ([productId, quantity]) => ({ productId, quantity }));
     const productIds = aggregatedItems.map((i) => i.productId);
-
+// t-3
     const sale = await this.dataSource.transaction(async (manager) => {
+      // t-3a
       const products = await this.productsRepository.findByIds(productIds, manager);
 
       if (products.length !== productIds.length) {
@@ -85,7 +86,7 @@ export class SalesService {
       const total = subtotal - discountAmount;
 
       const invoiceNumber = this.generateInvoiceNumber();
-
+// t-3b
       const created = await this.salesRepository.create({
         invoiceNumber,
         subtotal,
@@ -97,7 +98,7 @@ export class SalesService {
         userId,
         items: saleItems as SaleItem[],
       }, manager);
-
+// t-3c
       for (const item of aggregatedItems) {
         await this.inventoryService.decreaseStock(item.productId, item.quantity, manager);
       }
@@ -141,7 +142,7 @@ export class SalesService {
         `Cannot transition from ${sale.status} to ${newStatus}`,
       );
     }
-
+// t-4
     const updated = await this.dataSource.transaction(async (manager) => {
       if (newStatus === SaleStatus.REFUNDED) {
         const fullSale = await this.salesRepository.findById(sale.id, manager);

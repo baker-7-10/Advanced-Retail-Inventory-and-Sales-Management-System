@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InventoryRepository } from './repositories/inventory.repository';
+import { InventoryGateway } from './inventory.gateway';
 import { AuditLogService } from '../common/services/audit-log.service';
 import { AuditEvent } from '../common/audit/audit-event.enum';
 
@@ -8,6 +9,7 @@ import { AuditEvent } from '../common/audit/audit-event.enum';
 export class InventoryService {
   constructor(
     private readonly inventoryRepository: InventoryRepository,
+    private readonly inventoryGateway: InventoryGateway,
     private readonly auditLogService: AuditLogService,
   ) {}
 
@@ -26,7 +28,7 @@ export class InventoryService {
     }
     return inventory;
   }
-
+// 2-tA
   async increaseStock(productId: number, quantity: number, manager: EntityManager): Promise<void> {
     const inventory = await this.inventoryRepository.findByProductIdWithLock(productId, manager);
     if (!inventory) {
@@ -34,7 +36,7 @@ export class InventoryService {
     }
     await this.inventoryRepository.increment(inventory.id, quantity, manager);
   }
-
+// 2-tB
   async decreaseStock(productId: number, quantity: number, manager: EntityManager): Promise<void> {
     const inventory = await this.inventoryRepository.findByProductIdWithLock(productId, manager);
     if (!inventory) {
@@ -57,6 +59,7 @@ export class InventoryService {
     }
     inventory.quantity = quantity;
     await this.inventoryRepository.save(inventory, manager);
+    this.inventoryGateway.emitStockUpdate(productId, quantity);
     this.auditLogService.log(AuditEvent.INVENTORY_UPDATED, { userId, productId });
   }
 
@@ -67,6 +70,7 @@ export class InventoryService {
     }
     inventory.minimumStock = minimumStock;
     await this.inventoryRepository.save(inventory);
+    this.inventoryGateway.emitStockUpdate(productId, inventory.quantity);
     this.auditLogService.log(AuditEvent.INVENTORY_UPDATED, { userId, productId });
   }
 

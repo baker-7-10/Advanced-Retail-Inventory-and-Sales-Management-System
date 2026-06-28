@@ -13,11 +13,10 @@ export class InventoryRepository {
   private getRepo(manager?: EntityManager): Repository<Inventory> {
     return manager ? manager.getRepository(Inventory) : this.repo;
   }
-
   async findByProductId(productId: number, manager?: EntityManager): Promise<Inventory | null> {
     return this.getRepo(manager).findOne({ where: { productId } });
   }
-
+// 1-t
   async findByProductIdWithLock(productId: number, manager: EntityManager): Promise<Inventory | null> {
     return this.getRepo(manager).findOne({
       where: { productId },

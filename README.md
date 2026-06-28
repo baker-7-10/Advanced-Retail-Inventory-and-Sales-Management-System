@@ -104,7 +104,7 @@ npm run build
 # Run MySQL on your own (e.g. Docker for just the DB)
 docker run -d --name retail-db \
   -e MYSQL_ROOT_PASSWORD=rootpassword \
-  -e MYSQL_DATABASE=retail_db \
+  -e MYSQL_DATABASE=retail_db \Nardpos h
   -e MYSQL_USER=retail_user \
   -e MYSQL_PASSWORD=retail_password \
   -p 3306:3306 mysql:8.0

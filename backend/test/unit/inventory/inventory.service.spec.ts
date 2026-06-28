@@ -3,6 +3,7 @@ import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InventoryService } from '../../../src/inventory/inventory.service';
 import { InventoryRepository } from '../../../src/inventory/repositories/inventory.repository';
+import { InventoryGateway } from '../../../src/inventory/inventory.gateway';
 import { AuditLogService } from '../../../src/common/services/audit-log.service';
 import { buildMockInventory } from '../../fixtures';
 
@@ -34,6 +35,7 @@ describe('InventoryService', () => {
       providers: [
         InventoryService,
         { provide: InventoryRepository, useValue: repo },
+        { provide: InventoryGateway, useValue: { emitStockUpdate: jest.fn() } },
         { provide: AuditLogService, useValue: { log: jest.fn() } },
       ],
     }).compile();
